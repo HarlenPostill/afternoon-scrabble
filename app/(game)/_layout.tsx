@@ -2,6 +2,7 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 
+import { GameProvider } from '@/context/GameContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function GameLayout() {
@@ -9,17 +10,19 @@ export default function GameLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack
-        screenOptions={{
-          contentStyle: {
-            position: 'relative',
-          },
-          headerShown: false,
-        }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="newGame" />
-        <Stack.Screen name="activeGame" />
-      </Stack>
+      <GameProvider>
+        <Stack
+          screenOptions={{
+            contentStyle: {
+              position: 'relative',
+            },
+            headerShown: false,
+          }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="newGame" />
+          <Stack.Screen name="activeGame" />
+        </Stack>
+      </GameProvider>
     </ThemeProvider>
   );
 }

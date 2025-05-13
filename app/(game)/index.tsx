@@ -10,20 +10,18 @@ const IntroScreen = () => {
   const handleResumeGame = async () => {
     const hasGame = await loadSavedGame();
     if (hasGame) {
-      router.push('/(game)/activeGame');
+      router.replace('/(game)/activeGame');
     }
   };
 
   return (
     <SafeAreaView style={[styles.introScreen, styles.buttonFlexBox]}>
       <Text style={[styles.title, styles.titleTypo]}>Afternoon Scrabble</Text>
-
       <TouchableOpacity
         style={[styles.button, styles.buttonFlexBox]}
         onPress={() => router.push('/(game)/newGame')}>
         <Text style={[styles.newGame, styles.titleTypo]}>New game</Text>
       </TouchableOpacity>
-
       <TouchableOpacity style={[styles.button, styles.buttonFlexBox]} onPress={handleResumeGame}>
         <Text style={[styles.newGame, styles.titleTypo]}>Resume Game</Text>
       </TouchableOpacity>

@@ -1,3 +1,4 @@
+import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useGame } from '@/context/GameContext';
 // eslint-disable-next-line import/no-unresolved
 import { Player } from '@/types';
@@ -19,7 +20,7 @@ const NewGame = () => {
     }));
 
     await initializeGame(players);
-    router.push('/(game)/activeGame');
+    router.replace('/(game)/activeGame');
   };
 
   const updatePlayerName = (index: number, name: string) => {
@@ -31,7 +32,12 @@ const NewGame = () => {
   return (
     <SafeAreaView style={styles.NewGame}>
       <View style={styles.gameConfig}>
-        <Text style={[styles.titile, styles.titileTypo]}>New Game</Text>
+        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <IconSymbol name="chevron.left" size={20} color={'#000'} />
+          </TouchableOpacity>
+          <Text style={[styles.titile, styles.titileTypo]}>New Game</Text>
+        </View>
 
         <View style={styles.playerCount}>
           <Text style={[styles.playerNumberTitle, styles.titileTypo]}>How Many Players?</Text>
@@ -52,7 +58,7 @@ const NewGame = () => {
         </View>
 
         <View style={styles.playerCount}>
-          <Text style={[styles.playerNumberTitle, styles.titileTypo]}>Who`s Playing?</Text>
+          <Text style={[styles.playerNumberTitle, styles.titileTypo]}>{"Who's Playing?"}</Text>
           {Array.from({ length: playerCount }).map((_, index) => (
             <TextInput
               key={index}

@@ -1,3 +1,4 @@
+import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useGame } from '@/context/GameContext';
 import * as React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -27,10 +28,12 @@ const NewGame = () => {
       <View style={[styles.settingsAndInformation, styles.playerFramesFlexBox]}>
         <Text style={[styles.titile, styles.titileTypo]}>Afternoon Scrabble</Text>
         <View style={styles.settingsFrame}>
-          <TouchableOpacity onPress={undoLastMove}>
-            <Text style={styles.undoButton}>􀰛</Text>
+          <TouchableOpacity
+            style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}
+            onPress={undoLastMove}>
+            <IconSymbol name={'arrowshape.turn.up.backward.fill'} color={'#dc7480'} />
+            <Text style={{ fontSize: 18, color: '#DC747F', fontWeight: 500 }}>Undo</Text>
           </TouchableOpacity>
-          <Text style={[styles.settingsButton, styles.titileTypo]}>􀍟</Text>
         </View>
       </View>
 
@@ -117,6 +120,15 @@ const NewGame = () => {
           </View>
         </View>
       </View>
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          backgroundColor: '#DCDCDC',
+          height: 40,
+          width: 400,
+        }}
+      />
     </SafeAreaView>
   );
 };
@@ -148,6 +160,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     gap: 6,
     flex: 1,
+    maxWidth: 170,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -211,8 +224,8 @@ const styles = StyleSheet.create({
   playerImageContainer: {
     borderRadius: 9999,
     backgroundColor: '#dc7480',
-    width: 101,
-    height: 101,
+    width: 80,
+    height: 80,
     overflow: 'hidden',
   },
   playerName: {
@@ -232,7 +245,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   topPlayerFrame: {
-    gap: 22,
+    gap: 24,
     justifyContent: 'center',
     flexDirection: 'row',
     alignSelf: 'stretch',

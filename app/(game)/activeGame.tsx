@@ -115,7 +115,7 @@ const NewGame = () => {
               <Text style={[styles.playerName, styles.titileTypo]}>0</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.addKey, styles.addKeyLayout]} onPress={clearInput}>
-              <Text style={[styles.text11, styles.titileTypo]}>􀆛</Text>
+              <IconSymbol name="delete.left" color={'#000'} />
             </TouchableOpacity>
           </View>
         </View>

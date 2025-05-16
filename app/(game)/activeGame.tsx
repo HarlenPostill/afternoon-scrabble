@@ -1,11 +1,15 @@
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useGame } from '@/context/GameContext';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as React from 'react';
+import { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const NewGame = () => {
   const { gameState, selectPlayer, addNumber, addScore, undoLastMove, clearInput } = useGame();
+
+  const [awake, setAwake] = useState(false);
 
   const handlePlayerSelect = (playerId: string) => {
     selectPlayer(playerId);
@@ -14,6 +18,17 @@ const NewGame = () => {
   const handleNumberPress = (num: string) => {
     if (gameState.currentPlayerId) {
       addNumber(num);
+    }
+  };
+
+  const toggleKeepAwake = () => {
+    setAwake(!awake);
+    if (awake) {
+      deactivateKeepAwake();
+      console.log('Deactivated keep awake');
+    } else {
+      activateKeepAwakeAsync();
+      console.log('avtivated keep awake');
     }
   };
 
@@ -27,6 +42,16 @@ const NewGame = () => {
     <SafeAreaView style={[styles.gameScreen, styles.gameScreenFlexBox]}>
       <View style={[styles.settingsAndInformation, styles.playerFramesFlexBox]}>
         <Text style={[styles.titile, styles.titileTypo]}>Afternoon Scrabble</Text>
+        <TouchableOpacity
+          style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}
+          onPress={toggleKeepAwake}>
+          {awake ? (
+            <IconSymbol name={'cup.and.saucer.fill'} size={30} color={'#dc7480'} />
+          ) : (
+            <IconSymbol name={'cup.and.saucer'} size={30} color={'#dc7480'} />
+          )}
+        </TouchableOpacity>
+
         <View style={styles.settingsFrame}>
           <TouchableOpacity
             style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}
@@ -82,10 +107,26 @@ const NewGame = () => {
       </View>
 
       <View style={styles.bottomFrameKeyboardAndClue}>
-        <View style={[styles.total, styles.totalFlexBox]}>
-          <Text style={[styles.currentAddedValue, styles.playerTotalScoreTypo]}>
+        <View
+          style={[
+            styles.total,
+            styles.totalFlexBox,
+            {
+              height: 122,
+              paddingHorizontal: 8,
+              gap: 2,
+              borderTopLeftRadius: 25,
+              borderTopRightRadius: 25,
+            },
+          ]}>
+          <Text numberOfLines={1} style={[styles.currentAddedValue, styles.playerTotalScoreTypo]}>
             {gameState.currentInput || '0'}
           </Text>
+          <TouchableOpacity
+            style={[styles.largeAddKey, styles.addKeyLayout]}
+            onPress={handleAddScore}>
+            <Text style={[styles.playerName, styles.titileTypo]}>+</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={[styles.keyboard, styles.totalFlexBox]}>
@@ -106,8 +147,12 @@ const NewGame = () => {
             </View>
           ))}
           <View style={[styles.topKeyboardRow, styles.playerFrameFlexBox]}>
-            <TouchableOpacity style={[styles.addKey, styles.addKeyLayout]} onPress={handleAddScore}>
-              <Text style={[styles.playerName, styles.titileTypo]}>+</Text>
+            <TouchableOpacity
+              style={[styles.addKey, styles.addKeyLayout]}
+              onPress={() => {
+                console.log('switch keyboard');
+              }}>
+              <Text style={[styles.playerName, styles.titileTypo]}>Check</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.numberTile, styles.addKeyLayout]}
@@ -124,9 +169,10 @@ const NewGame = () => {
         style={{
           position: 'absolute',
           bottom: 0,
+          left: 0,
           backgroundColor: '#DCDCDC',
-          height: 40,
-          width: 400,
+          height: 30,
+          width: 500,
         }}
       />
     </SafeAreaView>
@@ -181,7 +227,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderBottomWidth: 1,
     borderStyle: 'solid',
-    borderRadius: 5,
+    borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
@@ -215,17 +261,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   settingsAndInformation: {
-    paddingVertical: 26,
+    paddingTop: 26,
     flexDirection: 'row',
     gap: 0,
     justifyContent: 'space-between',
     overflow: 'hidden',
   },
   playerImageContainer: {
-    borderRadius: 9999,
+    borderRadius: 99,
     backgroundColor: '#dc7480',
-    width: 80,
-    height: 80,
+    width: 75,
+    height: 75,
     overflow: 'hidden',
   },
   playerName: {
@@ -245,22 +291,21 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   topPlayerFrame: {
-    gap: 24,
+    gap: 6,
     justifyContent: 'center',
     flexDirection: 'row',
     alignSelf: 'stretch',
-    alignItems: 'center',
   },
   playerFrames: {
-    paddingVertical: 0,
-    gap: 12,
-    flex: 1,
+    paddingVertical: 6,
+    gap: 6,
+    alignItems: 'stretch',
   },
   currentAddedValue: {
     fontSize: 60,
   },
   total: {
-    flexDirection: 'row',
+    flexDirection: 'column',
   },
   numberTile: {
     borderColor: '#888b8f',
@@ -272,26 +317,28 @@ const styles = StyleSheet.create({
   },
   addKey: {
     backgroundColor: '#babdc1',
-    borderColor: '#7b7d7f',
+    width: '100%',
+    borderColor: '#7B7D7F',
   },
-  text11: {
-    color: '#000',
-    textAlign: 'left',
-    fontFamily: 'SF Pro Display',
-    fontSize: 22,
+  largeAddKey: {
+    backgroundColor: '#90A9EA',
+    width: '100%',
+    borderColor: '#7387BB',
   },
   keyboard: {
-    padding: 16,
+    padding: 8,
     gap: 5,
     overflow: 'hidden',
   },
   bottomFrameKeyboardAndClue: {
     alignSelf: 'stretch',
+    height: 349,
   },
   gameScreen: {
     width: '100%',
-    height: 844,
+    height: '100%',
     alignItems: 'center',
+    alignSelf: 'stretch',
     flex: 1,
     backgroundColor: '#fff',
   },

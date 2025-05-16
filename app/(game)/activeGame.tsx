@@ -5,11 +5,16 @@ import * as React from 'react';
 import { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import fourLetterWords from '../assets/dictionary.json';
 
 const NewGame = () => {
   const { gameState, selectPlayer, addNumber, addScore, undoLastMove, clearInput } = useGame();
 
   const [awake, setAwake] = useState(false);
+  const [keyboardMode, setKeyboardMode] = useState<'numbers' | 'qwerty'>('numbers');
+  const [wordValidationStatus, setWordValidationStatus] = useState<'none' | 'valid' | 'invalid'>(
+    'none'
+  );
 
   const handlePlayerSelect = (playerId: string) => {
     selectPlayer(playerId);
@@ -21,6 +26,12 @@ const NewGame = () => {
     }
   };
 
+  const handleLetterPress = (letter: string) => {
+    if (gameState.currentPlayerId) {
+      addNumber(letter);
+    }
+  };
+
   const toggleKeepAwake = () => {
     setAwake(!awake);
     if (awake) {
@@ -28,14 +39,120 @@ const NewGame = () => {
       console.log('Deactivated keep awake');
     } else {
       activateKeepAwakeAsync();
-      console.log('avtivated keep awake');
+      console.log('activated keep awake');
     }
   };
 
   const handleAddScore = () => {
     if (gameState.currentPlayerId && gameState.currentInput) {
-      addScore();
+      if (keyboardMode === 'numbers') {
+        addScore();
+      } else {
+        // Check if word is valid
+        const enteredWord = gameState.currentInput.toLowerCase();
+        const isValidWord = fourLetterWords.includes(enteredWord);
+
+        setWordValidationStatus(isValidWord ? 'valid' : 'invalid');
+
+        // Reset validation status after 2 seconds
+        setTimeout(() => {
+          setWordValidationStatus('none');
+          if (isValidWord) {
+            addScore();
+          }
+        }, 2000);
+      }
     }
+  };
+
+  const toggleKeyboardMode = () => {
+    // Clear the current input when switching keyboard modes
+    clearInput();
+    setKeyboardMode(keyboardMode === 'numbers' ? 'qwerty' : 'numbers');
+  };
+
+  // The text color for the current input based on word validation status
+  const getInputTextColor = () => {
+    if (wordValidationStatus === 'valid') return '#4CAF50'; // Green
+    if (wordValidationStatus === 'invalid') return '#F44336'; // Red
+    return '#000'; // Default black
+  };
+
+  const renderNumberKeyboard = () => {
+    return (
+      <>
+        {[
+          ['1', '2', '3'],
+          ['4', '5', '6'],
+          ['7', '8', '9'],
+        ].map((row, i) => (
+          <View key={i} style={[styles.topKeyboardRow, styles.playerFrameFlexBox]}>
+            {row.map(num => (
+              <TouchableOpacity
+                key={num}
+                style={[styles.numberTile, styles.addKeyLayout]}
+                onPress={() => handleNumberPress(num)}>
+                <Text style={[styles.playerName, styles.titileTypo]}>{num}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ))}
+        <View style={[styles.topKeyboardRow, styles.playerFrameFlexBox]}>
+          <TouchableOpacity
+            style={[styles.addKey, styles.addKeyLayout]}
+            onPress={toggleKeyboardMode}>
+            <Text style={[styles.playerName, styles.titileTypo]}>Check</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.numberTile, styles.addKeyLayout]}
+            onPress={() => handleNumberPress('0')}>
+            <Text style={[styles.playerName, styles.titileTypo]}>0</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.addKey, styles.addKeyLayout]} onPress={clearInput}>
+            <IconSymbol name="delete.left" color={'#000'} />
+          </TouchableOpacity>
+        </View>
+      </>
+    );
+  };
+
+  const renderQwertyKeyboard = () => {
+    const keyboardRows = [
+      ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+      ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+      ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+    ];
+
+    return (
+      <>
+        {keyboardRows.map((row, rowIndex) => (
+          <View key={rowIndex} style={[styles.topKeyboardRow, styles.playerFrameFlexBox]}>
+            {rowIndex === 2 && (
+              <TouchableOpacity
+                style={[styles.addKey, styles.addKeyLayout]}
+                onPress={toggleKeyboardMode}>
+                <Text style={[styles.playerName, styles.titileTypo, { fontSize: 16 }]}>Add</Text>
+              </TouchableOpacity>
+            )}
+
+            {row.map(letter => (
+              <TouchableOpacity
+                key={letter}
+                style={[styles.numberTile, styles.addKeyLayout]}
+                onPress={() => handleLetterPress(letter)}>
+                <Text style={[styles.playerName, styles.titileTypo]}>{letter}</Text>
+              </TouchableOpacity>
+            ))}
+
+            {rowIndex === 2 && (
+              <TouchableOpacity style={[styles.addKey, styles.addKeyLayout]} onPress={clearInput}>
+                <IconSymbol name="delete.left" color={'#000'} />
+              </TouchableOpacity>
+            )}
+          </View>
+        ))}
+      </>
+    );
   };
 
   return (
@@ -119,50 +236,26 @@ const NewGame = () => {
               borderTopRightRadius: 25,
             },
           ]}>
-          <Text numberOfLines={1} style={[styles.currentAddedValue, styles.playerTotalScoreTypo]}>
+          <Text
+            numberOfLines={1}
+            style={[
+              styles.currentAddedValue,
+              styles.playerTotalScoreTypo,
+              { color: getInputTextColor() },
+            ]}>
             {gameState.currentInput || '0'}
           </Text>
           <TouchableOpacity
             style={[styles.largeAddKey, styles.addKeyLayout]}
             onPress={handleAddScore}>
-            <Text style={[styles.playerName, styles.titileTypo]}>+</Text>
+            <Text style={[styles.playerName, styles.titileTypo]}>
+              {keyboardMode === 'numbers' ? '+' : 'Check Word'}
+            </Text>
           </TouchableOpacity>
         </View>
 
         <View style={[styles.keyboard, styles.totalFlexBox]}>
-          {[
-            ['1', '2', '3'],
-            ['4', '5', '6'],
-            ['7', '8', '9'],
-          ].map((row, i) => (
-            <View key={i} style={[styles.topKeyboardRow, styles.playerFrameFlexBox]}>
-              {row.map(num => (
-                <TouchableOpacity
-                  key={num}
-                  style={[styles.numberTile, styles.addKeyLayout]}
-                  onPress={() => handleNumberPress(num)}>
-                  <Text style={[styles.playerName, styles.titileTypo]}>{num}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          ))}
-          <View style={[styles.topKeyboardRow, styles.playerFrameFlexBox]}>
-            <TouchableOpacity
-              style={[styles.addKey, styles.addKeyLayout]}
-              onPress={() => {
-                console.log('switch keyboard');
-              }}>
-              <Text style={[styles.playerName, styles.titileTypo]}>Check</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.numberTile, styles.addKeyLayout]}
-              onPress={() => handleNumberPress('0')}>
-              <Text style={[styles.playerName, styles.titileTypo]}>0</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.addKey, styles.addKeyLayout]} onPress={clearInput}>
-              <IconSymbol name="delete.left" color={'#000'} />
-            </TouchableOpacity>
-          </View>
+          {keyboardMode === 'numbers' ? renderNumberKeyboard() : renderQwertyKeyboard()}
         </View>
       </View>
       <View
@@ -171,7 +264,7 @@ const NewGame = () => {
           bottom: 0,
           left: 0,
           backgroundColor: '#DCDCDC',
-          height: 30,
+          height: keyboardMode === 'numbers' ? 30 : 85,
           width: 500,
         }}
       />
@@ -213,9 +306,10 @@ const styles = StyleSheet.create({
   playerTotalScoreTypo: {
     fontWeight: '500',
     textAlign: 'left',
+
     color: '#000',
     fontFamily: 'SF Pro Display',
-    textTransform: 'capitalize',
+    textTransform: 'uppercase',
   },
   totalFlexBox: {
     backgroundColor: '#dcdcdc',

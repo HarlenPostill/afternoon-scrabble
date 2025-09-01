@@ -6,12 +6,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const IntroScreen = () => {
   const { loadSavedGame } = useGame();
+  const [useCustomNames, setUseCustomNames] = React.useState(false);
 
   const handleResumeGame = async () => {
     const hasGame = await loadSavedGame();
     if (hasGame) {
       router.replace("/(game)/activeGame");
     }
+  };
+
+  const handleStartNewGame = () => {
+    router.push({
+      pathname: "/(game)/newGame",
+      params: { useCustomNames: useCustomNames ? "1" : "0" },
+    });
   };
 
   return (
@@ -23,7 +31,7 @@ const IntroScreen = () => {
       <Text style={[styles.title, styles.titleTypo]}>Afternoon Scrabble</Text>
       <TouchableOpacity
         style={[styles.button, styles.buttonFlexBox]}
-        onPress={() => router.push("/(game)/newGame")}
+        onPress={handleStartNewGame}
       >
         <Text style={[styles.newGame, styles.titleTypo]}>New game</Text>
       </TouchableOpacity>
@@ -32,6 +40,23 @@ const IntroScreen = () => {
         onPress={handleResumeGame}
       >
         <Text style={[styles.newGame, styles.titleTypo]}>Resume Game</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={{
+          marginTop: 16,
+          marginBottom: 8,
+          padding: 10,
+          backgroundColor: "#feeef1",
+          borderRadius: 8,
+        }}
+        onPress={() => setUseCustomNames((prev) => !prev)}
+      >
+        <Text style={{ color: "#dc7480", fontWeight: "500", fontSize: 16 }}>
+          {useCustomNames
+            ? "Use default Player names"
+            : "Use Amelie, Harlen, Josie, Ari, Fletcher"}
+        </Text>
       </TouchableOpacity>
 
       <Text

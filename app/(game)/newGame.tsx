@@ -2,7 +2,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useGame } from "@/context/GameContext";
 
 import { Player } from "@/types";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import * as React from "react";
 import {
   StyleSheet,
@@ -15,21 +15,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const NewGame = () => {
   const { initializeGame } = useGame();
+  const params = useLocalSearchParams();
+  const useCustomNames = params.useCustomNames === "1";
+  const customNames = ["Amelie", "Harlen", "Josie", "Ari", "Fletcher"];
+  const defaultNames = ["", "", "", "", ""];
   const [playerCount, setPlayerCount] = React.useState<number>(3);
-  const [playerNames, setPlayerNames] = React.useState<string[]>([
-    "",
-    "",
-    "",
-    "",
-    "",
-  ]);
+  const [playerNames, setPlayerNames] = React.useState<string[]>(
+    useCustomNames ? customNames : defaultNames
+  );
 
   const handleStartGame = async () => {
     const players: Player[] = playerNames
       .slice(0, playerCount)
       .map((name, index) => ({
         id: `player${index + 1}`,
-        name: name || `Player ${index + 1}`,
+        name:
+          name || (useCustomNames ? customNames[index] : `Player ${index + 1}`),
         score: 0,
       }));
 

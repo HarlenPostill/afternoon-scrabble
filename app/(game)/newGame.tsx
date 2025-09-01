@@ -34,6 +34,7 @@ const NewGame = () => {
       }));
 
     await initializeGame(players);
+    router.dismissAll();
     router.replace("/(game)/activeGame");
   };
 

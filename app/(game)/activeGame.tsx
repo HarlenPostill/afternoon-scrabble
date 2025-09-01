@@ -1,20 +1,30 @@
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import { useGame } from '@/context/GameContext';
-import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import * as React from 'react';
-import { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import fourLetterWords from '../assets/dictionary.json';
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { useGame } from "@/context/GameContext";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
+import { router } from "expo-router";
+import * as React from "react";
+import { useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import fourLetterWords from "../assets/dictionary.json";
 
 const NewGame = () => {
-  const { gameState, selectPlayer, addNumber, addScore, undoLastMove, clearInput } = useGame();
+  const {
+    gameState,
+    selectPlayer,
+    addNumber,
+    addScore,
+    undoLastMove,
+    clearInput,
+  } = useGame();
 
   const [awake, setAwake] = useState(false);
-  const [keyboardMode, setKeyboardMode] = useState<'numbers' | 'qwerty'>('numbers');
-  const [wordValidationStatus, setWordValidationStatus] = useState<'none' | 'valid' | 'invalid'>(
-    'none'
+  const [keyboardMode, setKeyboardMode] = useState<"numbers" | "qwerty">(
+    "numbers"
   );
+  const [wordValidationStatus, setWordValidationStatus] = useState<
+    "none" | "valid" | "invalid"
+  >("none");
 
   const handlePlayerSelect = (playerId: string) => {
     selectPlayer(playerId);
@@ -36,27 +46,27 @@ const NewGame = () => {
     setAwake(!awake);
     if (awake) {
       deactivateKeepAwake();
-      console.log('Deactivated keep awake');
+      console.log("Deactivated keep awake");
     } else {
       activateKeepAwakeAsync();
-      console.log('activated keep awake');
+      console.log("activated keep awake");
     }
   };
 
   const handleAddScore = () => {
     if (gameState.currentPlayerId && gameState.currentInput) {
-      if (keyboardMode === 'numbers') {
+      if (keyboardMode === "numbers") {
         addScore();
       } else {
         // Check if word is valid
         const enteredWord = gameState.currentInput.toLowerCase();
         const isValidWord = fourLetterWords.includes(enteredWord);
 
-        setWordValidationStatus(isValidWord ? 'valid' : 'invalid');
+        setWordValidationStatus(isValidWord ? "valid" : "invalid");
 
         // Reset validation status after 2 seconds
         setTimeout(() => {
-          setWordValidationStatus('none');
+          setWordValidationStatus("none");
           if (isValidWord) {
             addScore();
           }
@@ -68,31 +78,37 @@ const NewGame = () => {
   const toggleKeyboardMode = () => {
     // Clear the current input when switching keyboard modes
     clearInput();
-    setKeyboardMode(keyboardMode === 'numbers' ? 'qwerty' : 'numbers');
+    setKeyboardMode(keyboardMode === "numbers" ? "qwerty" : "numbers");
   };
 
   // The text color for the current input based on word validation status
   const getInputTextColor = () => {
-    if (wordValidationStatus === 'valid') return '#4CAF50'; // Green
-    if (wordValidationStatus === 'invalid') return '#F44336'; // Red
-    return '#000'; // Default black
+    if (wordValidationStatus === "valid") return "#4CAF50"; // Green
+    if (wordValidationStatus === "invalid") return "#F44336"; // Red
+    return "#000"; // Default black
   };
 
   const renderNumberKeyboard = () => {
     return (
       <>
         {[
-          ['1', '2', '3'],
-          ['4', '5', '6'],
-          ['7', '8', '9'],
+          ["1", "2", "3"],
+          ["4", "5", "6"],
+          ["7", "8", "9"],
         ].map((row, i) => (
-          <View key={i} style={[styles.topKeyboardRow, styles.playerFrameFlexBox]}>
-            {row.map(num => (
+          <View
+            key={i}
+            style={[styles.topKeyboardRow, styles.playerFrameFlexBox]}
+          >
+            {row.map((num) => (
               <TouchableOpacity
                 key={num}
                 style={[styles.numberTile, styles.addKeyLayout]}
-                onPress={() => handleNumberPress(num)}>
-                <Text style={[styles.playerName, styles.titileTypo]}>{num}</Text>
+                onPress={() => handleNumberPress(num)}
+              >
+                <Text style={[styles.playerName, styles.titileTypo]}>
+                  {num}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -100,16 +116,21 @@ const NewGame = () => {
         <View style={[styles.topKeyboardRow, styles.playerFrameFlexBox]}>
           <TouchableOpacity
             style={[styles.addKey, styles.addKeyLayout]}
-            onPress={toggleKeyboardMode}>
+            onPress={toggleKeyboardMode}
+          >
             <Text style={[styles.playerName, styles.titileTypo]}>Check</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.numberTile, styles.addKeyLayout]}
-            onPress={() => handleNumberPress('0')}>
+            onPress={() => handleNumberPress("0")}
+          >
             <Text style={[styles.playerName, styles.titileTypo]}>0</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.addKey, styles.addKeyLayout]} onPress={clearInput}>
-            <IconSymbol name="delete.left" color={'#000'} />
+          <TouchableOpacity
+            style={[styles.addKey, styles.addKeyLayout]}
+            onPress={clearInput}
+          >
+            <IconSymbol name="delete.left" color={"#000"} />
           </TouchableOpacity>
         </View>
       </>
@@ -118,35 +139,53 @@ const NewGame = () => {
 
   const renderQwertyKeyboard = () => {
     const keyboardRows = [
-      ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-      ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-      ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+      ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
+      ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+      ["z", "x", "c", "v", "b", "n", "m"],
     ];
 
     return (
       <>
         {keyboardRows.map((row, rowIndex) => (
-          <View key={rowIndex} style={[styles.topKeyboardRow, styles.playerFrameFlexBox]}>
+          <View
+            key={rowIndex}
+            style={[styles.topKeyboardRow, styles.playerFrameFlexBox]}
+          >
             {rowIndex === 2 && (
               <TouchableOpacity
                 style={[styles.addKey, styles.addKeyLayout]}
-                onPress={toggleKeyboardMode}>
-                <Text style={[styles.playerName, styles.titileTypo, { fontSize: 16 }]}>Add</Text>
+                onPress={toggleKeyboardMode}
+              >
+                <Text
+                  style={[
+                    styles.playerName,
+                    styles.titileTypo,
+                    { fontSize: 16 },
+                  ]}
+                >
+                  Add
+                </Text>
               </TouchableOpacity>
             )}
 
-            {row.map(letter => (
+            {row.map((letter) => (
               <TouchableOpacity
                 key={letter}
                 style={[styles.numberTile, styles.addKeyLayout]}
-                onPress={() => handleLetterPress(letter)}>
-                <Text style={[styles.playerName, styles.titileTypo]}>{letter}</Text>
+                onPress={() => handleLetterPress(letter)}
+              >
+                <Text style={[styles.playerName, styles.titileTypo]}>
+                  {letter}
+                </Text>
               </TouchableOpacity>
             ))}
 
             {rowIndex === 2 && (
-              <TouchableOpacity style={[styles.addKey, styles.addKeyLayout]} onPress={clearInput}>
-                <IconSymbol name="delete.left" color={'#000'} />
+              <TouchableOpacity
+                style={[styles.addKey, styles.addKeyLayout]}
+                onPress={clearInput}
+              >
+                <IconSymbol name="delete.left" color={"#000"} />
               </TouchableOpacity>
             )}
           </View>
@@ -158,30 +197,46 @@ const NewGame = () => {
   return (
     <SafeAreaView style={[styles.gameScreen, styles.gameScreenFlexBox]}>
       <View style={[styles.settingsAndInformation, styles.playerFramesFlexBox]}>
-        <Text style={[styles.titile, styles.titileTypo]}>Afternoon Scrabble</Text>
+        <TouchableOpacity onLongPress={() => router.replace("/(game)")}>
+          <Text style={[styles.titile, styles.titileTypo]}>
+            Afternoon Scrabble
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity
-          style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}
-          onPress={toggleKeepAwake}>
+          style={{ flexDirection: "row", gap: 6, alignItems: "center" }}
+          onPress={toggleKeepAwake}
+        >
           {awake ? (
-            <IconSymbol name={'cup.and.saucer.fill'} size={30} color={'#dc7480'} />
+            <IconSymbol
+              name={"cup.and.saucer.fill"}
+              size={30}
+              color={"#dc7480"}
+            />
           ) : (
-            <IconSymbol name={'cup.and.saucer'} size={30} color={'#dc7480'} />
+            <IconSymbol name={"cup.and.saucer"} size={30} color={"#dc7480"} />
           )}
         </TouchableOpacity>
 
         <View style={styles.settingsFrame}>
           <TouchableOpacity
-            style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}
-            onPress={undoLastMove}>
-            <IconSymbol name={'arrowshape.turn.up.backward.fill'} color={'#dc7480'} />
-            <Text style={{ fontSize: 18, color: '#DC747F', fontWeight: 500 }}>Undo</Text>
+            style={{ flexDirection: "row", gap: 6, alignItems: "center" }}
+            onPress={undoLastMove}
+            hitSlop={20}
+          >
+            <IconSymbol
+              name={"arrowshape.turn.up.backward.fill"}
+              color={"#dc7480"}
+            />
+            <Text style={{ fontSize: 18, color: "#DC747F", fontWeight: 500 }}>
+              Undo
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={[styles.playerFrames, styles.playerFramesFlexBox]}>
         <View style={styles.topPlayerFrame}>
-          {gameState.players.slice(0, 2).map(player => (
+          {gameState.players.slice(0, 2).map((player) => (
             <TouchableOpacity
               key={player.id}
               style={[
@@ -190,10 +245,15 @@ const NewGame = () => {
                   ? styles.activePlayerFrame
                   : styles.innactivePlayerFrame,
               ]}
-              onPress={() => handlePlayerSelect(player.id)}>
+              onPress={() => handlePlayerSelect(player.id)}
+            >
               <View style={styles.playerImageContainer} />
-              <Text style={[styles.playerName, styles.titileTypo]}>{player.name}</Text>
-              <Text style={[styles.playerTotalScore, styles.playerTotalScoreTypo]}>
+              <Text style={[styles.playerName, styles.titileTypo]}>
+                {player.name}
+              </Text>
+              <Text
+                style={[styles.playerTotalScore, styles.playerTotalScoreTypo]}
+              >
                 {player.score}
               </Text>
             </TouchableOpacity>
@@ -202,7 +262,7 @@ const NewGame = () => {
 
         {gameState.players.length > 2 && (
           <View style={styles.topPlayerFrame}>
-            {gameState.players.slice(2).map(player => (
+            {gameState.players.slice(2).map((player) => (
               <TouchableOpacity
                 key={player.id}
                 style={[
@@ -211,10 +271,15 @@ const NewGame = () => {
                     ? styles.activePlayerFrame
                     : styles.innactivePlayerFrame,
                 ]}
-                onPress={() => handlePlayerSelect(player.id)}>
+                onPress={() => handlePlayerSelect(player.id)}
+              >
                 <View style={styles.playerImageContainer} />
-                <Text style={[styles.playerName, styles.titileTypo]}>{player.name}</Text>
-                <Text style={[styles.playerTotalScore, styles.playerTotalScoreTypo]}>
+                <Text style={[styles.playerName, styles.titileTypo]}>
+                  {player.name}
+                </Text>
+                <Text
+                  style={[styles.playerTotalScore, styles.playerTotalScoreTypo]}
+                >
                   {player.score}
                 </Text>
               </TouchableOpacity>
@@ -235,36 +300,41 @@ const NewGame = () => {
               borderTopLeftRadius: 25,
               borderTopRightRadius: 25,
             },
-          ]}>
+          ]}
+        >
           <Text
             numberOfLines={1}
             style={[
               styles.currentAddedValue,
               styles.playerTotalScoreTypo,
               { color: getInputTextColor() },
-            ]}>
-            {gameState.currentInput || '0'}
+            ]}
+          >
+            {gameState.currentInput || "0"}
           </Text>
           <TouchableOpacity
             style={[styles.largeAddKey, styles.addKeyLayout]}
-            onPress={handleAddScore}>
+            onPress={handleAddScore}
+          >
             <Text style={[styles.playerName, styles.titileTypo]}>
-              {keyboardMode === 'numbers' ? '+' : 'Check Word'}
+              {keyboardMode === "numbers" ? "+" : "Check Word"}
             </Text>
           </TouchableOpacity>
         </View>
 
         <View style={[styles.keyboard, styles.totalFlexBox]}>
-          {keyboardMode === 'numbers' ? renderNumberKeyboard() : renderQwertyKeyboard()}
+          {keyboardMode === "numbers"
+            ? renderNumberKeyboard()
+            : renderQwertyKeyboard()}
         </View>
       </View>
       <View
         style={{
-          position: 'absolute',
+          position: "absolute",
           bottom: 0,
           left: 0,
-          backgroundColor: '#DCDCDC',
-          height: keyboardMode === 'numbers' ? 30 : 85,
+          backgroundColor: "#DCDCDC",
+          height: keyboardMode === "numbers" ? 30 : 85,
           width: 500,
         }}
       />
@@ -275,24 +345,24 @@ const NewGame = () => {
 const styles = StyleSheet.create({
   gameScreenFlexBox: {
     gap: 0,
-    justifyContent: 'space-between',
-    overflow: 'hidden',
+    justifyContent: "space-between",
+    overflow: "hidden",
   },
   playerFramesFlexBox: {
     paddingHorizontal: 16,
-    alignSelf: 'stretch',
-    alignItems: 'center',
+    alignSelf: "stretch",
+    alignItems: "center",
   },
   titileTypo: {
-    textAlign: 'left',
-    fontFamily: 'SF Pro Display',
+    textAlign: "left",
+    fontFamily: "SF Pro Display",
     fontSize: 22,
   },
   playerFrameFlexBox: {
     gap: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
   },
   playerFrameBase: {
     padding: 14,
@@ -300,141 +370,141 @@ const styles = StyleSheet.create({
     gap: 6,
     flex: 1,
     maxWidth: 170,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   playerTotalScoreTypo: {
-    fontWeight: '500',
-    textAlign: 'left',
+    fontWeight: "500",
+    textAlign: "left",
 
-    color: '#000',
-    fontFamily: 'SF Pro Display',
-    textTransform: 'uppercase',
+    color: "#000",
+    fontFamily: "SF Pro Display",
+    textTransform: "uppercase",
   },
   totalFlexBox: {
-    backgroundColor: '#dcdcdc',
-    justifyContent: 'center',
-    alignSelf: 'stretch',
-    alignItems: 'center',
+    backgroundColor: "#dcdcdc",
+    justifyContent: "center",
+    alignSelf: "stretch",
+    alignItems: "center",
   },
   addKeyLayout: {
     height: 50,
     borderBottomWidth: 1,
-    borderStyle: 'solid',
+    borderStyle: "solid",
     borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
     flex: 1,
   },
   titile: {
-    fontWeight: '600',
-    color: '#000',
-    textAlign: 'left',
-    fontFamily: 'SF Pro Display',
+    fontWeight: "600",
+    color: "#000",
+    textAlign: "left",
+    fontFamily: "SF Pro Display",
     fontSize: 22,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
   },
   undoButton: {
     fontSize: 24,
-    fontFamily: 'SF Pro',
-    textAlign: 'center',
-    color: '#dc7480',
+    fontFamily: "SF Pro",
+    textAlign: "center",
+    color: "#dc7480",
   },
   settingsButton: {
-    fontWeight: '700',
-    color: '#dc7480',
-    textAlign: 'left',
-    fontFamily: 'SF Pro Display',
+    fontWeight: "700",
+    color: "#dc7480",
+    textAlign: "left",
+    fontFamily: "SF Pro Display",
     fontSize: 22,
   },
   settingsFrame: {
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
     gap: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   settingsAndInformation: {
     paddingTop: 26,
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 0,
-    justifyContent: 'space-between',
-    overflow: 'hidden',
+    justifyContent: "space-between",
+    overflow: "hidden",
   },
   playerImageContainer: {
     borderRadius: 99,
-    backgroundColor: '#dc7480',
+    backgroundColor: "#dc7480",
     width: 75,
     height: 75,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   playerName: {
-    color: '#000',
-    textAlign: 'left',
-    fontFamily: 'SF Pro Display',
+    color: "#000",
+    textAlign: "left",
+    fontFamily: "SF Pro Display",
     fontSize: 22,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
   },
   playerTotalScore: {
     fontSize: 26,
   },
   activePlayerFrame: {
-    backgroundColor: '#f7b6c1',
+    backgroundColor: "#f7b6c1",
   },
   innactivePlayerFrame: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   topPlayerFrame: {
     gap: 6,
-    justifyContent: 'center',
-    flexDirection: 'row',
-    alignSelf: 'stretch',
+    justifyContent: "center",
+    flexDirection: "row",
+    alignSelf: "stretch",
   },
   playerFrames: {
     paddingVertical: 6,
     gap: 6,
-    alignItems: 'stretch',
+    alignItems: "stretch",
   },
   currentAddedValue: {
     fontSize: 60,
   },
   total: {
-    flexDirection: 'column',
+    flexDirection: "column",
   },
   numberTile: {
-    borderColor: '#888b8f',
-    backgroundColor: '#fff',
+    borderColor: "#888b8f",
+    backgroundColor: "#fff",
   },
   topKeyboardRow: {
-    flexDirection: 'row',
-    alignSelf: 'stretch',
+    flexDirection: "row",
+    alignSelf: "stretch",
   },
   addKey: {
-    backgroundColor: '#babdc1',
-    width: '100%',
-    borderColor: '#7B7D7F',
+    backgroundColor: "#babdc1",
+    width: "100%",
+    borderColor: "#7B7D7F",
   },
   largeAddKey: {
-    backgroundColor: '#90A9EA',
-    width: '100%',
-    borderColor: '#7387BB',
+    backgroundColor: "#90A9EA",
+    width: "100%",
+    borderColor: "#7387BB",
   },
   keyboard: {
     padding: 8,
     gap: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   bottomFrameKeyboardAndClue: {
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
     height: 349,
   },
   gameScreen: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    alignSelf: 'stretch',
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    alignSelf: "stretch",
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
 });
 
